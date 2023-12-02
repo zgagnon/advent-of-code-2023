@@ -3,12 +3,12 @@
 build-depends: base, split
 -}
 
-import System.IO
-import Data.Foldable
-import Data.List.Split
-import Data.List(isPrefixOf, isSuffixOf)
-import Data.Function
-import Debug.Trace
+import           Data.Foldable
+import           Data.Function
+import           Data.List       (isPrefixOf, isSuffixOf)
+import           Data.List.Split
+import           Debug.Trace
+import           System.IO
 
 
 front :: String -> Int

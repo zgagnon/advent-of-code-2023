@@ -3,11 +3,11 @@
 build-depends: base, split, pretty-simple, text
 -}
 
-import Data.List.Split
-import Data.Char(digitToInt, isSpace)
-import Text.Pretty.Simple (pPrint)
-import Debug.Trace
-import Data.Foldable
+import           Data.Char          (digitToInt, isSpace)
+import           Data.Foldable
+import           Data.List.Split
+import           Debug.Trace
+import           Text.Pretty.Simple (pPrint)
 
 main :: IO ()
 main = do
@@ -39,21 +39,19 @@ parseGame s = let
     in Game {gameId=gameId, pulls=  pulls}
 
 parsePull :: String -> Pull
-parsePull s = let
-        parts = map (splitOn " ") $ map (dropWhile isSpace) $ splitOn "," s
-        in foldl partToPull
-            Pull {red=0, green=0, blue=0} parts
+parsePull s = foldl partToPull
+            Pull {red=0, green=0, blue=0} $ map (splitOn " ") $ map (dropWhile isSpace) $ splitOn "," s
 
 partToPull :: Pull -> [String] -> Pull
 partToPull acc next = case next of
-    [count,"red"] -> acc {red = read count :: Int}
+    [count,"red"]   -> acc {red = read count :: Int}
     [count,"green"] -> acc {green = read count :: Int}
-    [count,"blue"] -> acc {blue = read count :: Int}
-    [_,_] -> acc
+    [count,"blue"]  -> acc {blue = read count :: Int}
+    [_,_]           -> acc
 
 possibleWithBag ::  Pull -> Game -> Bool
-possibleWithBag bag game = foldl (\acc next -> (red next) <= (red bag) 
-    && (green next) <= (green bag) 
+possibleWithBag bag game = foldl (\acc next -> (red next) <= (red bag)
+    && (green next) <= (green bag)
     && (blue next) <= (blue bag) && acc) True (pulls game)
 
 minimumBag :: Game -> Pull

@@ -13,6 +13,7 @@
           packages = [ 
             pkgs.haskell.compiler.ghc927
             pkgs.haskellPackages.cabal-install
+            pkgs.stylish-haskell
              ];
         };
       });
