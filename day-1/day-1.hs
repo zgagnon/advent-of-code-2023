@@ -1,4 +1,4 @@
-#!/nix/store/biijk3a1bc18w8b9d1kjlfqbn0nyh944-cabal-install-3.10.2.1/bin/cabal
+#!cabal
 {- cabal:
 build-depends: base, split, regex-compat
 -}
