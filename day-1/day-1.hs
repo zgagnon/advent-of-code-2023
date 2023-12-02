@@ -43,12 +43,14 @@ forwards (x:xs, acc) = parse (\acc x -> acc ++ [x]) isPrefixOf (x:xs, acc)
 -- Build from the back, so we add new characters to the front of the substring
 -- and check if the substring is a suffix of the target string
 backwards :: (String, String) -> (String, String)
-backwards (x:xs, acc) = parse (\acc x -> [x] ++ acc) isSuffixOf (x:xs, acc)
+backwards (list, acc) = let reversed = reverse list in
+  case reversed of 
+    (x:xs) -> parse (\acc x -> [x] ++ acc) isSuffixOf (x:xs, acc)
  
 pair :: String -> Int
 pair x = let
   front = forwards (x, "")
-  back = backwards (reverse x, "")
+  back = backwards (x, "")
   in trace (x ++ " " ++ (fst front) ++ " " ++ (fst back)) (read (fst front ++ fst back) :: Int)
 
 main :: IO ()
