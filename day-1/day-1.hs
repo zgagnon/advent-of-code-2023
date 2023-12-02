@@ -14,7 +14,7 @@ parse :: (String -> Char -> String) -> ([Char] -> [Char] -> Bool) -> (String, St
 parse subStringer compare (x:xs, acc) = let sub =  (subStringer acc x) in
   case (reads [x]) :: [(Int, String)] of
       [( _, "")] -> ([x], "")
-      _         -> if sub == "one" || x == '1' then ("1", "")
+      _         -> if sub == "one" then ("1", "")
       else if sub == "two" then ("2", "")
       else if sub == "three" then ("3", "")
       else if sub == "four"  then ("4", "")
