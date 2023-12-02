@@ -1,6 +1,6 @@
 #!cabal
 {- cabal:
-build-depends: base, split, regex-compat
+build-depends: base, split
 -}
 
 import System.IO
@@ -10,54 +10,60 @@ import Data.List(isPrefixOf, isSuffixOf)
 import Data.Function
 import Debug.Trace
 
-parse :: (String -> Char -> String) -> ([Char] -> [Char] -> Bool) -> (String, String) -> (String, String)
-parse subStringer compare (x:xs, acc) = let sub =  (subStringer acc x) in
-  case (reads [x]) :: [(Int, String)] of
-      [( _, "")] -> ([x], "")
-      _         -> if sub == "one" then ("1", "")
-      else if sub == "two" then ("2", "")
-      else if sub == "three" then ("3", "")
-      else if sub == "four"  then ("4", "")
-      else if sub == "five" then ("5", "")
-      else if sub == "six"  then ("6", "")
-      else if sub == "seven"  then ("7", "")
-      else if sub == "eight"  then ("8", "")
-      else if sub == "nine"  then ("9", "")
-      else if compare sub "one"
-        || compare sub "two"
-        || compare sub "three"
-        || compare sub "four"
-        || compare sub "five"
-        || compare sub "six"
-        || compare sub "seven"
-        || compare sub "eight"
-        || compare sub "nine"
-        then parse subStringer compare (xs, sub)
-        else parse subStringer compare (xs, [x])
 
--- Build from the front, so we add new characters to the end of the substring
--- and check if the substring is a prefix of the target string
-forwards :: (String, String) -> (String, String)
-forwards (x:xs, acc) = parse (\acc x -> acc ++ [x]) isPrefixOf (x:xs, acc)
+front :: String -> Int
+front x = if isPrefixOf "one" x then 1
+  else if isPrefixOf "two" x then 2
+  else if isPrefixOf "three" x then 3
+  else if isPrefixOf "four" x then 4
+  else if isPrefixOf "five" x then 5
+  else if isPrefixOf "six" x then 6
+  else if isPrefixOf "seven" x then 7
+  else if isPrefixOf "eight" x then 8
+  else if isPrefixOf "nine" x then 9
+  else if isPrefixOf "1" x then 1
+  else if isPrefixOf "2" x then 2
+  else if isPrefixOf "3" x then 3
+  else if isPrefixOf "4" x then 4
+  else if isPrefixOf "5" x then 5
+  else if isPrefixOf "6" x then 6
+  else if isPrefixOf "7" x then 7
+  else if isPrefixOf "8" x then 8
+  else if isPrefixOf "9" x then 9
+  else front (tail x)
 
--- Build from the back, so we add new characters to the front of the substring
--- and check if the substring is a suffix of the target string
-backwards :: (String, String) -> (String, String)
-backwards (list, acc) = let reversed = reverse list in
-  case reversed of 
-    (x:xs) -> parse (\acc x -> [x] ++ acc) isSuffixOf (x:xs, acc)
- 
-pair :: String -> Int
-pair x = let
-  front = forwards (x, "")
-  back = backwards (x, "")
-  in trace (x ++ " " ++ (fst front) ++ " " ++ (fst back)) (read (fst front ++ fst back) :: Int)
+back :: String -> Int
+back x = if isSuffixOf "one" x then 1
+  else if isSuffixOf "two" x then 2
+  else if isSuffixOf "three" x then 3
+  else if isSuffixOf "four" x then 4
+  else if isSuffixOf "five" x then 5
+  else if isSuffixOf "six" x then 6
+  else if isSuffixOf "seven" x then 7
+  else if isSuffixOf "eight" x then 8
+  else if isSuffixOf "nine" x then 9
+  else if isSuffixOf "1" x then 1
+  else if isSuffixOf "2" x then 2
+  else if isSuffixOf "3" x then 3
+  else if isSuffixOf "4" x then 4
+  else if isSuffixOf "5" x then 5
+  else if isSuffixOf "6" x then 6
+  else if isSuffixOf "7" x then 7
+  else if isSuffixOf "8" x then 8
+  else if isSuffixOf "9" x then 9
+  else back (reverse (tail (reverse x)))
+
+dumbpair :: String -> Int
+dumbpair x = let
+  f = front x
+  b = back x
+  in trace (x ++ " " ++ (show f) ++ " " ++ (show b)) (f * 10 + b)
 
 main :: IO ()
 main = do
-  contents <- readFile "./day-1/day-1.input.txt"
+  contents <- readFile "./day-1/day-1.input"
   let split = splitOn "\n" contents
-  let parsed = map pair split
+  let parsed = map dumbpair split
   let sums = sum parsed
   print parsed
   print (length parsed)
