@@ -4,26 +4,14 @@ build-depends: base, split, regex-compat
 -}
 
 import System.IO
-import Control.Monad
 import Data.Foldable
 import Data.List.Split
 import Data.List(isPrefixOf, isSuffixOf)
-import Text.Regex (mkRegex, subRegex, Regex)
 import Data.Function
 import Debug.Trace
 
-
-digits = ['0'..'9']
-
-filterDigits :: String -> String
-filterDigits = filter (`elem` digits)
-
-combine :: String -> String
-combine [] = []
-combine (xs) = [head xs, last xs]
-
-forwards :: (String, String) -> (String, String)
-forwards (x:xs, acc) = let sub =  (acc ++ [x]) in
+parse :: (String -> Char -> String) -> ([Char] -> [Char] -> Bool) -> (String, String) -> (String, String)
+parse subStringer compare (x:xs, acc) = let sub = trace ([x] ++ " " ++ xs ++ " " ++ acc) (subStringer acc x) in
  if sub == "one" || x == '1' then ("1", "")
  else if sub == "two" || x == '2' then ("2", "")
  else if sub == "three" || x == '3' then ("3", "")
@@ -33,42 +21,23 @@ forwards (x:xs, acc) = let sub =  (acc ++ [x]) in
  else if sub == "seven" || x == '7' then ("7", "")
  else if sub == "eight" || x == '8' then ("8", "")
  else if sub == "nine" || x == '9' then ("9", "")
- else if isPrefixOf sub "one"
-  || isPrefixOf sub "two"
-  || isPrefixOf sub "three"
-  || isPrefixOf sub "four"
-  || isPrefixOf sub "five"
-  || isPrefixOf sub "six"
-  || isPrefixOf sub "seven"
-  || isPrefixOf sub "eight"
-  || isPrefixOf sub "nine"
-  then forwards (xs, sub)
-  else forwards (xs, [x])
+ else if compare sub "one"
+  || compare sub "two"
+  || compare sub "three"
+  || compare sub "four"
+  || compare sub "five"
+  || compare sub "six"
+  || compare sub "seven"
+  || compare sub "eight"
+  || compare sub "nine"
+  then parse subStringer compare (xs, sub)
+  else parse subStringer compare (xs, [x])
+
+forwards :: (String, String) -> (String, String)
+forwards (x:xs, acc) = parse (\acc x -> acc ++ [x]) isPrefixOf (x:xs, acc)
 
 backwards :: (String, String) -> (String, String)
-backwards (x:xs, acc) = let 
-    sub = [x] ++ acc
-  in
- if sub == "one" || x == '1' then ("1", "")
- else if sub == "two" || x == '2' then ("2", "")
- else if sub == "three" || x == '3' then  ("3", "")
- else if sub == "four" || x == '4' then ("4", "")
- else if sub == "five" || x == '5' then  ("5", "")
- else if sub == "six" || x == '6' then  ("6", "")
- else if sub == "seven" || x == '7' then  ("7", "")
- else if sub == "eight" || x == '8' then  ("8", "")
- else if sub == "nine" || x == '9' then  ("9", "")
- else if isSuffixOf sub "one"
-  || isSuffixOf sub "two"
-  || isSuffixOf sub "three"
-  || isSuffixOf sub "four"
-  || isSuffixOf sub "five"
-  || isSuffixOf sub "six"
-  || isSuffixOf sub "seven"
-  || isSuffixOf sub "eight"
-  || isSuffixOf sub "nine"
-  then backwards (xs, sub)
-  else backwards  (xs, [x])
+backwards (x:xs, acc) = parse (\acc x -> [x] ++ acc) isSuffixOf (x:xs, acc)
  
 pair :: String -> Int
 pair x = let
