@@ -34,11 +34,9 @@ maximumPull = Pull {red=12, green=13, blue=14}
 parseGame :: String -> Game
 parseGame s = let
     gameAndPulls = splitOn ":" s
-    frontMatter = head gameAndPulls
-    frontMatterSplit = splitOn " " frontMatter
-    gameId = read (head $ tail frontMatterSplit) :: Int
-    pulls = splitOn ";" $ last gameAndPulls
-    in Game {gameId=gameId, pulls= map parsePull pulls}
+    gameId = stringToInt $ head $ tail $ splitOn " " $ head gameAndPulls
+    pulls = map parsePull $ splitOn ";" $ last gameAndPulls
+    in Game {gameId=gameId, pulls=  pulls}
 
 parsePull :: String -> Pull
 parsePull s = let
