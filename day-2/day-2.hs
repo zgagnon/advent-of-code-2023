@@ -13,8 +13,7 @@ main :: IO ()
 main = do
     contents <- lines <$> readFile "day-2/day-2.input"
     let games = map parseGame contents
-    let possible = filter (possibleWithBag maximumPull) games
-    let possibleIds = sum $ map gameId possible
+    let possibleIds = sum $ map gameId $ filter (possibleWithBag maximumPull) games
     print "Part 1, sum of id of possible games"
     pPrint possibleIds
     let minimums = map minimumBag games
@@ -40,7 +39,8 @@ parseGame s = let
 
 parsePull :: String -> Pull
 parsePull s = foldl partToPull
-            Pull {red=0, green=0, blue=0} $ map (splitOn " ") $ map (dropWhile isSpace) $ splitOn "," s
+            Pull {red=0, green=0, blue=0} $ map (splitOn " ")
+            $ map (dropWhile isSpace) $ splitOn "," s
 
 partToPull :: Pull -> [String] -> Pull
 partToPull acc next = case next of
@@ -50,15 +50,17 @@ partToPull acc next = case next of
     [_,_]           -> acc
 
 possibleWithBag ::  Pull -> Game -> Bool
-possibleWithBag bag game = foldl (\acc next -> (red next) <= (red bag)
+possibleWithBag bag game = foldl (\acc next ->
+    (red next) <= (red bag)
     && (green next) <= (green bag)
-    && (blue next) <= (blue bag) && acc) True (pulls game)
+    && (blue next) <= (blue bag) && acc) True $ pulls game
 
 minimumBag :: Game -> Pull
 minimumBag game = foldl (\acc next ->
     next {red = max (red acc) (red next),
     green = max (green acc) (green next),
-    blue = max (blue acc) (blue next)}) Pull {red=0, green=0, blue=0} (pulls game)
+    blue = max (blue acc) (blue next)})
+    Pull {red=0, green=0, blue=0} $ pulls game
 
 bagPower :: Pull -> Int
 bagPower bag = (red bag) * (green bag) * (blue bag)
