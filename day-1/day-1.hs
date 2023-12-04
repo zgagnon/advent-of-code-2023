@@ -12,7 +12,7 @@ import           System.IO
 
 
 front :: String -> Int
-front x = if isPrefixOf "one" x then 1
+front (x:xs) = if isPrefixOf "one" x then 1
   else if isPrefixOf "two" x then 2
   else if isPrefixOf "three" x then 3
   else if isPrefixOf "four" x then 4
@@ -30,7 +30,7 @@ front x = if isPrefixOf "one" x then 1
   else if isPrefixOf "7" x then 7
   else if isPrefixOf "8" x then 8
   else if isPrefixOf "9" x then 9
-  else front (tail x)
+  else front 
 
 back :: String -> Int
 back x = if isSuffixOf "one" x then 1

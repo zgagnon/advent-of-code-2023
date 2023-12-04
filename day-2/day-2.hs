@@ -1,6 +1,15 @@
 #!cabal
 {- cabal:
-build-depends: base, split, pretty-simple, text
+    build-depends: base, split, pretty-simple, text, containers
+    default-language: Haskell2010
+    executable advent-of-code2023
+        main-is: Main.hs
+        hs-source-dirs: app
+        ghc-options: -Wall -Werror
+        build-depends:
+            base, split, pretty-simple, text
+            
+
 -}
 
 import           Data.Char          (digitToInt, isSpace)
@@ -17,7 +26,7 @@ main = do
     print "Part 1, sum of id of possible games"
     pPrint possibleIds
     let minimums = map minimumBag games
-    print "Part 2, sum of bag power of minimum bags"
+print "Part 2, sum of bag power of minimum bags"
     pPrint $ sum $ map bagPower minimums
 
 
