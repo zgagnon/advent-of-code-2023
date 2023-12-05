@@ -1,7 +1,4 @@
-#!cabal
-{- cabal:
-build-depends: base, split
--}
+
 
 import           Data.Foldable
 import           Data.Function
@@ -12,7 +9,7 @@ import           System.IO
 
 
 front :: String -> Int
-front (x:xs) = if isPrefixOf "one" x then 1
+front x = if isPrefixOf "one" x then 1
   else if isPrefixOf "two" x then 2
   else if isPrefixOf "three" x then 3
   else if isPrefixOf "four" x then 4
@@ -30,7 +27,7 @@ front (x:xs) = if isPrefixOf "one" x then 1
   else if isPrefixOf "7" x then 7
   else if isPrefixOf "8" x then 8
   else if isPrefixOf "9" x then 9
-  else front 
+  else front $ tail x
 
 back :: String -> Int
 back x = if isSuffixOf "one" x then 1
@@ -61,7 +58,7 @@ dumbpair x = let
 
 main :: IO ()
 main = do
-  contents <- readFile "./day-1/day-1.input"
+  contents <- readFile "./inputs/day-1.input"
   let split = splitOn "\n" contents
   let parsed = map dumbpair split
   let sums = sum parsed

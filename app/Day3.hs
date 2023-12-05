@@ -1,35 +1,16 @@
-#!cabal
-{- cabal:
-    build-depends: base, split, pretty-simple, text, containers
-    default-language: Haskell2010
-    executable advent-of-code2023
-        main-is: Main.hs
-        hs-source-dirs: app
-        ghc-options: -Wall -Werror
-        build-depends:
-            base,
-            base-compat
-
-
--}
-
 import           Data.Char
-import           Data.Foldable
 import           Data.Function
-import           Data.List
-import           Debug.Trace
 
 
 main :: IO ()
 main = do
-    contents <-  lines <$> readFile "day-3/day-3.input"
+    contents <-  lines <$> readFile "inputs/day-3.input"
     let grid = zip [0..] $ map (zip [0..]) contents
     let symbols = findSymbols grid
     let partNums = findParts grid
     let actualParts = filter (isPart symbols) partNums
     let gearRatios = do
-            symbol <- symbols
-            return $ findGearRatio actualParts symbol
+            findGearRatio actualParts <$> symbols
     print $ actualParts
         >>= (\part -> [read (num part) :: Int])
         & sum
@@ -37,7 +18,7 @@ main = do
 
 
 isPartMarker :: Char -> Bool
-isPartMarker c = (not $ isDigit c) && c /= '.'
+isPartMarker c = not (isDigit c) && c /= '.'
 
 type Grid  = [(Int, [(Int, Char)])]
 type Symbol = (Int, Int, Char)
@@ -47,19 +28,9 @@ isNeighbors PartBuilder {tl=(tlRow, tlCol), br=(brRow, brCol)} (row, col) =
     tlRow <= row && tlCol <= col && brRow >= row && brCol >= col
 
 isPart :: [Symbol] -> PartBuilder -> Bool
-isPart symbols part = let
-    (tlRow, tlCol) = tl part
-    (brRow, brCol) = br part
-    in
-        foldl (\acc (row, col,_) ->
+isPart symbols part = foldl (\acc (row, col,_) ->
             acc || isNeighbors part (row, col)
         ) False symbols
-
-symbolLocation :: Symbol -> Maybe (Int, Int)
-symbolLocation (x, y, character) = case character of
-    isDigit -> Nothing
-    '.'     -> Nothing
-    _       -> Just (x, y)
 
 findSymbols  ::  Grid -> [Symbol]
 findSymbols diagram = do
@@ -77,16 +48,12 @@ buildPart row acc (col, char) =
             (x:xs) -> (x, xs)
     in
         if isDigit char
-        then case building partBuilder of
-            False ->  PartBuilder {num = [char], tl=(row - 1, col - 1 ), br=(row + 1, col + 1), building=True} : acc
-            True -> partBuilder {num = num partBuilder ++ [char], br=(row + 1, col + 1)} : rest
-        else case building partBuilder of
-            False -> acc
-            True  -> partBuilder {building=False} : rest
+        then (if building partBuilder then partBuilder {num = num partBuilder ++ [char], br=(row + 1, col + 1)} : rest else PartBuilder {num = [char], tl=(row - 1, col - 1 ), br=(row + 1, col + 1), building=True} : acc)
+        else (if building partBuilder then partBuilder {building=False} : rest else acc)
 
 findParts :: Grid -> [PartBuilder]
-findParts diagram = concat  $ map (\(rowIndex, row) ->
-    reverse $ foldl (buildPart rowIndex) [] $ row ++ [(150, '.')]) diagram
+findParts = concatMap (\(rowIndex, row) ->
+    reverse $ foldl (buildPart rowIndex) [] $ row ++ [(150, '.')])
 
 findGearRatio :: [PartBuilder] -> Symbol -> Int
 findGearRatio parts (row, col, ch) =
