@@ -81,9 +81,10 @@ executable main
     other-modules:
         StringProcessing
         Day7
+        Day1
     default-language: GHC2021
 
-test-suite unit-test
+test-suite test
     type:             exitcode-stdio-1.0
     main-is:          Spec.hs
     hs-source-dirs:   test
@@ -94,6 +95,8 @@ test-suite unit-test
         , tasty
         , split
         , hspec
+        , hspec-discover
     other-modules:
+        SpecHelper
         Day7Spec
     default-language: GHC2021

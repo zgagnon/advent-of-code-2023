@@ -2,6 +2,7 @@ module Day7Spec where
 
 import           Data.List.Split (splitOn)
 import           Day7
+import           SpecHelper
 import           Test.Hspec
 
 spec :: Spec
