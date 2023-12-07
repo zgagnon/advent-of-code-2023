@@ -16,19 +16,22 @@ data Hand = Hand {
 } deriving (Show, Eq, Ord)
 
 playDay7Part2 :: [String] -> Int
-playDay7Part2 input = undefined
+playDay7Part2 input = let
+    hands = parseHands matchHandsWithJoker input
+    rankedHands = rankHands compareFaceCardsWithJoker hands
+    in scoreRankedHands rankedHands
 
 playDay7Part1 :: [String] -> Int
 playDay7Part1 input = let
-    hands = parseHands input
-    rankedHands = rankHands hands
+    hands = parseHands matchHandType input
+    rankedHands = rankHands compareFaceCards hands
     in scoreRankedHands rankedHands
 
-parseHands :: [String] -> [Hand]
-parseHands hands = do
+parseHands :: (String -> HandType) -> [String] -> [Hand]
+parseHands matchHands hands = do
     hand <- hands
     let parts = splitOn " " hand
-    let handType = matchHandType $ head parts
+    let handType = matchHands $ head parts
     return $ Hand {
         hand = head parts
         , bid = stringToInt $  parts !! 1
@@ -48,22 +51,41 @@ matchHandType hand = let
         2:_   -> One
         _     -> High
 
+matchHandsWithJoker :: String -> HandType
+matchHandsWithJoker hand = let
+    jokerCount = length $ filter (== 'J') hand
+    in if jokerCount == 5
+        then Five
+        else let
+            handWithoutJoker = filter (/= 'J') hand
+            count = foldl (\acc x -> insertWith (+) x 1 acc) empty handWithoutJoker
+            cardCounts :: [Int] = sortBy (comparing Data.Ord.Down) (elems count)
+            countsWithJoker = (jokerCount + head cardCounts):tail cardCounts
+            in case  countsWithJoker of
+                5:_   -> Five
+                4:_   -> Four
+                3:2:_ -> Full
+                3:_   -> Three
+                2:2:_ -> Two
+                2:_   -> One
+                _     -> High
 
 stringToInt :: String -> Int
 stringToInt s = read s :: Int
 
-compareHands :: Hand -> Hand -> Ordering
-compareHands hand1 hand2 = let
+compareHands :: (Char -> Char -> Ordering) -> Hand -> Hand -> Ordering
+compareHands faceCompare hand1 hand2 = let
     handType1 = handType hand1
     handType2 = handType hand2
     in case compare handType1 handType2 of
-        EQ -> compareHandValues (hand hand1) (hand hand2)
+        EQ -> compareHandValues faceCompare (hand hand1) (hand hand2)
         x  -> x
 
-compareHandValues :: String -> String -> Ordering
-compareHandValues (x:xs) (y:ys)
-    | x == y = compareHandValues xs ys
-    | otherwise = compareFaceCards x y
+compareHandValues ::  (Char -> Char -> Ordering) -> String -> String -> Ordering
+compareHandValues faceCompare left right
+  | null left && null right = EQ
+  | head left == head right = compareHandValues faceCompare (tail left) (tail right)
+  | otherwise = faceCompare (head left) (head right)
 
 compareFaceCards :: Char -> Char -> Ordering
 compareFaceCards x y
@@ -80,8 +102,33 @@ compareFaceCards x y
     | x == 'J' = GT
     | otherwise = LT
 
-rankHands :: [Hand] -> [(Int, Hand)]
-rankHands hands =  zip [1..] $ sortBy compareHands hands
+rankHands :: (Char -> Char -> Ordering) -> [Hand] -> [(Int, Hand)]
+rankHands faceCompare hands =  zip [1..] $ sortBy (compareHands faceCompare) hands
 
 scoreRankedHands :: [(Int, Hand)] -> Int
 scoreRankedHands rankedHands = sum $ map (\(rank, hand) -> rank * bid hand) rankedHands
+
+compareHandsWithJoker :: Hand -> Hand -> Ordering
+compareHandsWithJoker hand1 hand2 = let
+    handType1 = handType hand1
+    handType2 = handType hand2
+    in case compare handType1 handType2 of
+        EQ -> compareHandValues compareFaceCardsWithJoker (hand hand1) (hand hand2)
+        x  -> x
+
+compareFaceCardsWithJoker :: Char -> Char -> Ordering
+compareFaceCardsWithJoker x y
+    | x == 'J' && y == 'J' = EQ
+    | x == 'J' = LT
+    | y == 'J' = GT
+    | isDigit x && isDigit y = compare x y
+    | isDigit x = LT
+    | isDigit y = GT
+    | x == y = EQ
+    | x == 'A' = GT
+    | y == 'A' = LT
+    | x == 'K' = GT
+    | y == 'K' = LT
+    | x == 'Q' = GT
+    | y == 'Q' = LT
+    | otherwise = LT

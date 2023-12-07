@@ -94,4 +94,6 @@ test-suite unit-test
         , tasty
         , split
         , hspec
+    other-modules:
+        Day7Spec
     default-language: GHC2021
