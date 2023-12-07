@@ -1,5 +1,6 @@
 import Data.List.Split (splitOn)
 
+
 main :: IO ()
 main = do
     content <- lines <$> readFile "inputs/day-6.input"
