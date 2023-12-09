@@ -4,6 +4,7 @@ import           Data.List.Split    (splitOn)
 import           Day1
 import           Day7
 import           Day8
+import           Day9
 import           System.Environment
 
 main :: IO ()
@@ -23,5 +24,8 @@ main = do
         "8" -> case part of
           "1" -> print $ playDay8Part1 file
           "2" -> print $ playDay8Part2 file
+        "9" -> case part of
+          "1" -> print $ playDay9Part1 file
+          "2" -> print $ playDay9Part2 file
         _   -> putStrLn "No such day"
 
