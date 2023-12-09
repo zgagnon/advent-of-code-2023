@@ -62,11 +62,13 @@ library
     exposed-modules:
         StringProcessing
         Day7
+        Day8
     hs-source-dirs: app
     build-depends:
         base >= 4.7 && < 5
         , split
         , containers
+        , Unique
     default-language: GHC2021
 
 executable main
@@ -78,10 +80,12 @@ executable main
         ,base >= 4.7 && < 5
         , split
         , containers
+        , Unique
     other-modules:
         StringProcessing
-        Day7
         Day1
+        Day7
+        Day8
     default-language: GHC2021
 
 test-suite test
@@ -96,6 +100,7 @@ test-suite test
         , split
         , hspec
         , hspec-discover
+        , containers
     other-modules:
         SpecHelper
         Day7Spec
